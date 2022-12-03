@@ -13,25 +13,24 @@
 using namespace std;
 
 enum json_type {JSON_NULL, JSON_BOOLEAN, JSON_STRING, JSON_NUMBER, JSON_ARRAY, JSON_OBJECT};
-enum parse_state {PARSE_COMPLETE, PARSE_WRONG_WORD, PARSE_EXTRA_WORD};
+enum parse_state {PARSE_COMPLETE, PARSE_WRONG_WORD, PARSE_EXTRA_WORD, PARSE_NO_WORD, PARSE_NO_DOUBLE_QUOTSTION, PARSE_INVALID_CHAR
+};
 
 ostream& operator<<(ostream&, const parse_state &);
 ostream& operator<<(ostream&, const json_type &);
-
-union json_value {
+struct json;
+class json_value {
+public:
 	double number;
 	bool boolean;
 	string  str;
-	vector<json_value> array;
-	vector<unordered_map<string, json_value>> object;
-	json_value(){}
-	~json_value() {}
+	vector<pair<string, json>> object;
+	vector<json> array;
 };
 
 struct json {
 	json_value value;
 	json_type type;
-	json(){}
 };
 
 struct parse_text
@@ -42,4 +41,5 @@ struct parse_text
 
 parse_state json_parse(string, json&);
 parse_state value_parse(parse_text&, json&);
+void json_free(json&);
 // TODO: 在此处引用程序需要的其他标头。
