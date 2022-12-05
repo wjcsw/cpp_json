@@ -1,5 +1,66 @@
 #include "cpp_json.h""
 
+void swap(json & left, json & right) {
+	swap(left.type, right.type);
+	swap(left.value, right.value);
+}
+
+bool operator!=(const json& left, const json& right) {
+	return !(left == right);
+}
+
+bool operator==(const json& left, const json& right) {
+	if (left.type != right.type) return false;
+	switch (left.type)
+	{
+	case JSON_NULL: return true;
+	case JSON_BOOLEAN: return left.value.boolean == right.value.boolean;
+	case JSON_NUMBER: return left.value.number == right.value.number;
+	case JSON_STRING: return left.value.str == right.value.str;
+	case JSON_ARRAY: 
+		for (size_t i = 0; i < left.value.array.size(); i++) {
+			if (left.value.array[i] != right.value.array[i]) return false;
+		}
+		return true;
+	case JSON_OBJECT:
+		for (size_t i = 0; i < left.value.object.size(); i++) {
+			if ((left.value.object[i].first != right.value.object[i].first)|| (left.value.object[i].second != right.value.object[i].second)) return false;
+		}
+		return true;
+	default:
+		break;
+	}
+}
+ostream& operator<<(ostream& out, const json& j) {
+	switch (j.type)
+	{
+	case JSON_NULL: break;
+	case JSON_BOOLEAN: out<<j.value.boolean; break;
+	case JSON_NUMBER: out<<j.value.number; break;
+	case JSON_STRING: out<<"\""<<j.value.str<< "\""; break;
+	case JSON_ARRAY:
+		out << "[";
+		for (size_t i = 0; i < j.value.array.size(); i++) {
+			out << j.value.array[i];
+			if (i != j.value.array.size() - 1) out << ", ";
+		}
+		out << "]";
+		break;
+	case JSON_OBJECT:
+		out << "{";
+		for (size_t i = 0; i < j.value.object.size(); i++) {
+			out << "\"" << j.value.object[i].first << "\"" << " : " << j.value.object[i].second;
+			if (i != j.value.array.size() - 1) out << ", ";
+		}
+		out << "}";
+		break;
+	default:
+		out << "非法JSON类型" << endl;
+		break;
+	}
+	return out;
+}
+
 ostream& operator<<(ostream& out, const parse_state& state) {
 	switch (state)
 	{
@@ -65,6 +126,8 @@ ostream& operator<<(ostream& out, const json_type& type) {
 void jump_space(parse_text& p) {
 	while (p.i < p.s.size() && (p.s[p.i] == ' '|| p.s[p.i] == '\t'|| p.s[p.i] == '\n' || p.s[p.i] == '\r')) p.i++;
 }
+
+parse_state value_parse(parse_text& p, json& result);
 parse_state array_parse(parse_text& p, json& result) {
 	p.i++;
 	jump_space(p);

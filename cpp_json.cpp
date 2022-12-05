@@ -24,6 +24,14 @@ double pass = 0;
 #define compare_object_size(expected, actual) compare(expected, actual.value.object.size(), "大小错误!")
 #define compare_key(expected, actual, i) compare(expected, actual.value.object[i].first, "key错误!")
 
+#define TEST_EQUAL(str,j1,j2) do{\
+		json_parse(str, j1);\
+		json_parse(str, j2);\
+		compare(j1, j2, "不相等!");\
+		json_free(j1);\
+		json_free(j2);\
+	}while(0)
+
 #define TEST_NUMBER(expected, actual, j) do{j.type = JSON_NULL;\
 		json_parse(actual, j);\
 		compare_type(JSON_NUMBER, j);\
@@ -252,6 +260,20 @@ void test_error() {
 	compare_error(PARSE_MISSING_COLON, json_parse("{\"TRUE\" 1", j));
 	compare_error(PARSE_MISSING_COLON, json_parse("{\"TRUE\", 1", j));
 	
+}
+
+void test_equal() {
+	json j1,j2;
+	TEST_EQUAL("null", j1, j2);
+	TEST_EQUAL("123", j1, j2);
+	TEST_EQUAL("fasle", j1, j2);
+	TEST_EQUAL("true", j1, j2);
+	TEST_EQUAL("[]", j1, j2);
+	TEST_EQUAL("[1,2,3]", j1, j2);
+	TEST_EQUAL("[[]]", j1, j2);
+	TEST_EQUAL("{}", j1, j2);
+	TEST_EQUAL("{\"a\":1,\"b\":2}", j1, j2);
+	swap(j1, j2);
 }
 
 
