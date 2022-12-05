@@ -33,6 +33,12 @@ ostream& operator<<(ostream& out, const parse_state& state) {
 	case PARSE_MISSING_COLON:
 		out << "PARSE_MISSING_COLON";
 		break;
+	case PARSE_INVALID_ESCAPE:
+		out << "PARSE_INVALID_ESCAPE";
+		break;
+	case PARSE_MISSING_KEY:
+		out << "PARSE_MISSING_KEY";
+		break;
 	default:
 		out << "invaild error"; break;
 		break;
@@ -62,16 +68,18 @@ void jump_space(parse_text& p) {
 parse_state array_parse(parse_text& p, json& result) {
 	p.i++;
 	jump_space(p);
-	while (p.i < p.s.size()) {
-		json j;
-		parse_state t = value_parse(p, j);
-		if(t!= PARSE_COMPLETE) return t;
-		result.value.array.push_back(j);
-		jump_space(p);
-		if (p.s[p.i] == ']') break;
-		if (p.s[p.i] == ',') p.i++;
-		else if (p.i < p.s.size()) return PARSE_MISSING_COMMA;
-		jump_space(p);
+	if (p.s[p.i] != ']') {
+		while (p.i < p.s.size()) {
+			json j;
+			parse_state t = value_parse(p, j);
+			if (t != PARSE_COMPLETE) return t;
+			result.value.array.push_back(j);
+			jump_space(p);
+			if (p.s[p.i] == ']') break;
+			if (p.s[p.i] == ',') p.i++;
+			else if (p.i < p.s.size()) return PARSE_MISSING_COMMA;
+			jump_space(p);
+		}
 	}
 	if (p.s[p.i] != ']') return PARSE_NO_SQUARE_BRACKET;
 	p.i++;
@@ -92,6 +100,7 @@ parse_state parse_hex4(string& p, unsigned &n) {
 }
 
 parse_state string_parse(parse_text& p, json& result) {
+	if (p.s[p.i] != '\"') return PARSE_MISSING_KEY;
 	p.i++;
 	unsigned u = 0, u2=0;
 	string t;
@@ -121,7 +130,6 @@ parse_state string_parse(parse_text& p, json& result) {
 					p.i += 3;
 					if (u2 < 0xDC00 || u2 > 0xDFFF) return PARSE_INVALID_UNICODE;
 					u = 0x10000 + (u - 0xD800) * 0x400 + (u2 - 0xDC00);
-					cout << u << endl;
 				}
 				if (u <= 0x7F) {
 					result.value.str.push_back(u & 0xFF);
@@ -144,13 +152,11 @@ parse_state string_parse(parse_text& p, json& result) {
 				}
 				break;
 			default:
-				if (p.s[p.i] < 0x20) {
-					return PARSE_INVALID_UNICODE;
-				}
-				result.value.str.push_back('\\');
-				result.value.str.push_back(p.s[p.i]);
-				break;
+				return PARSE_INVALID_ESCAPE;
 			}
+		}
+		else if (p.s[p.i] < 0x20) {
+			return PARSE_INVALID_UNICODE;
 		}
 		else if (p.s[p.i] == '\"') { ++p.i; result.type = JSON_STRING; return PARSE_COMPLETE; }
 		else result.value.str.push_back(p.s[p.i]);
@@ -163,6 +169,7 @@ parse_state string_parse(parse_text& p, json& result) {
 parse_state number_parse(parse_text& p, json& result) {
 	size_t i = p.i;
 	if (p.s[i] == '-') i++;
+	if (p.s[i] < '0' || p.s[i] > '9') return PARSE_WRONG_WORD;
 	if (i < p.s.size() && p.s[i] == '0') i++;
 	else {
 		i++;
@@ -172,7 +179,7 @@ parse_state number_parse(parse_text& p, json& result) {
 		i++;
 		while (i < p.s.size() && p.s[i] >= '0' && p.s[i] <= '9') i++;
 	}
-	if (i < p.s.size() && p.s[i] == 'e') {
+	if (i < p.s.size() && (p.s[i] == 'e'|| p.s[i] == 'E')) {
 		i++;
 		if (i < p.s.size() && p.s[i] == '-') i++;
 		if (i < p.s.size() && p.s[i] == '0') i++;
@@ -192,24 +199,27 @@ parse_state number_parse(parse_text& p, json& result) {
 parse_state object_parse(parse_text& p, json& result) {
 	p.i++;
 	jump_space(p);
-	while (p.i < p.s.size()) {
-		json j;
-		parse_state t = string_parse(p, j);
-		if (t != PARSE_COMPLETE) return t;
-		string str = j.value.str;
-		jump_space(p);
-		if (p.s[p.i] == ':') p.i++;
-		else return PARSE_MISSING_COLON;
-		jump_space(p);
-		t = value_parse(p, j);
-		if (t != PARSE_COMPLETE) return t;
-		result.value.object.push_back({str,j});
-		jump_space(p);
-		if (p.s[p.i] == '}') break;
-		if (p.s[p.i] == ',') p.i++;
-		else if(p.i<p.s.size())return PARSE_MISSING_COMMA;
-		jump_space(p);
-		
+	if (p.s[p.i] != '}') {
+		while (p.i < p.s.size()) {
+			json j;
+			parse_state t = string_parse(p, j);
+			if (t != PARSE_COMPLETE) return t;
+			string str = j.value.str;
+			json_free(j);
+			jump_space(p);
+			if (p.s[p.i] == ':') p.i++;
+			else return PARSE_MISSING_COLON;
+			jump_space(p);
+			t = value_parse(p, j);
+			if (t != PARSE_COMPLETE) return t;
+			result.value.object.push_back({ str,j });
+			jump_space(p);
+			if (p.s[p.i] == '}') break;
+			if (p.s[p.i] == ',') p.i++;
+			else if (p.i < p.s.size())return PARSE_MISSING_COMMA;
+			jump_space(p);
+
+		}
 	}
 	if (p.s[p.i] != '}') return PARSE_NO_CURLY_BRACKET;
 	p.i++;
@@ -223,11 +233,14 @@ parse_state value_parse(parse_text& p, json & result) {
 	string t;
 	switch (p.s[p.i])
 	{
-	case 'n':  t = p.s.substr(p.i, 4); if (t == "null") { result.type = JSON_NULL; p.i += 4; return PARSE_COMPLETE; }
+	case 'N':
+	case 'n':  t = p.s.substr(p.i, 4); transform(t.begin(), t.end(), t.begin(), ::tolower); if (t == "null") { result.type = JSON_NULL; p.i += 4; return PARSE_COMPLETE; }
 			else { return PARSE_WRONG_WORD; }
-	case 't':  t = p.s.substr(p.i, 4); if (t == "true") { result.type = JSON_BOOLEAN; result.value.boolean = true; p.i += 4; return PARSE_COMPLETE; }
+	case 'T':
+	case 't':  t = p.s.substr(p.i, 4); transform(t.begin(), t.end(), t.begin(), ::tolower); if (t == "true") { result.type = JSON_BOOLEAN; result.value.boolean = true; p.i += 4; return PARSE_COMPLETE; }
 			else { return PARSE_WRONG_WORD; }
-	case 'f':  t = p.s.substr(p.i, 5); if (t == "false") { result.type = JSON_BOOLEAN; result.value.boolean = false; p.i += 5; return PARSE_COMPLETE; }
+	case 'F':
+	case 'f':  t = p.s.substr(p.i, 5); transform(t.begin(), t.end(), t.begin(), ::tolower); if (t == "false") { result.type = JSON_BOOLEAN; result.value.boolean = false; p.i += 5; return PARSE_COMPLETE; }
 			else { return PARSE_WRONG_WORD; }
 	case '\"': return string_parse(p, result);
 	case '[': return array_parse(p, result);
@@ -238,7 +251,6 @@ parse_state value_parse(parse_text& p, json & result) {
 }
 
 parse_state json_parse(string json_text, json& result) {
-	transform(json_text.begin(), json_text.end(), json_text.begin(), ::tolower);
 	parse_text p{ json_text,0 };
 	result.type = JSON_NULL;
 	parse_state state = value_parse(p, result);
