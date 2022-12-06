@@ -5,7 +5,7 @@
 
 #include <iostream> 
 #include<vector>
-#include<unordered_map>
+#include<map>
 #include <sstream>
 #include<string>
 #include <algorithm>
@@ -24,7 +24,7 @@ public:
 	double number;
 	bool boolean;
 	string  str;
-	vector<pair<string, json>> object;
+	map<string, json> object;
 	vector<json> array;
 };
 
@@ -50,8 +50,8 @@ void json_free(json&);
 ostream& operator<<(ostream&, const json&);
 ostream& operator<<(ostream&, const parse_state&);
 ostream& operator<<(ostream&, const json_type&);
-bool operator==(const json&, const json&);
-bool operator!=(const json&, const json&);
+bool operator==(json&, json&);
+bool operator!=(json&, json&);
 void swap(json&, json&);
 
 // TODO: 在此处引用程序需要的其他标头。

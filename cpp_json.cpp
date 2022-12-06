@@ -22,7 +22,7 @@ double pass = 0;
 #define compare_string(expected, actual) compare(expected, actual.value.str, "值错误!")
 #define compare_array_size(expected, actual) compare(expected, actual.value.array.size(), "大小错误!")
 #define compare_object_size(expected, actual) compare(expected, actual.value.object.size(), "大小错误!")
-#define compare_key(expected, actual, i) compare(expected, actual.value.object[i].first, "key错误!")
+#define compare_key(expected, actual, i) compare(1, bool(actual.value.object.count(expected)), "key错误!")
 
 #define TEST_EQUAL(str,j1,j2) do{\
 		json_parse(str, j1);\
@@ -117,6 +117,8 @@ void test_number() {
 	TEST_NUMBER(-2.2250738585072014e-308, "-2.2250738585072014e-308", j);
 	TEST_NUMBER(1.7976931348623157e+308, "1.7976931348623157e+308", j);  /* Max double */
 	TEST_NUMBER(-1.7976931348623157e+308, "-1.7976931348623157e+308", j);
+	TEST_NUMBER(-1.7976931348623157e+308, "-1.7976931348623157e+309", j); /*数字溢出*/
+	TEST_NUMBER(1.7976931348623157e+308, "1.7976931348623157e+309", j);
 }
 
 void test_array() {
@@ -180,36 +182,36 @@ void test_object() {
 	compare_type(JSON_OBJECT, j);
 	compare_object_size(7, j);
 	compare_key("n", j, 0);
-	compare_type(JSON_NULL, j.value.object[0].second);
+	compare_type(JSON_NULL, j.value.object["n"]);
 	compare_key("f", j, 1);
-	compare_type(JSON_BOOLEAN, j.value.object[1].second);
-	compare_boolean(false, j.value.object[1].second);
+	compare_type(JSON_BOOLEAN, j.value.object["f"]);
+	compare_boolean(false, j.value.object["f"]);
 	compare_key("t", j, 2);
-	compare_type(JSON_BOOLEAN, j.value.object[2].second);
-	compare_boolean(true, j.value.object[2].second);
+	compare_type(JSON_BOOLEAN, j.value.object["t"]);
+	compare_boolean(true, j.value.object["t"]);
 	compare_key("i", j, 3);
-	compare_type(JSON_NUMBER, j.value.object[3].second);
-	compare_number(123, j.value.object[3].second);
+	compare_type(JSON_NUMBER, j.value.object["i"]);
+	compare_number(123, j.value.object["i"]);
 	compare_key("s", j, 4);
-	compare_type(JSON_STRING, j.value.object[4].second);
-	compare_string("abc", j.value.object[4].second);
+	compare_type(JSON_STRING, j.value.object["s"]);
+	compare_string("abc", j.value.object["s"]);
 	compare_key("a", j, 5);
-	compare_type(JSON_ARRAY, j.value.object[5].second);
-	compare_array_size(3, j.value.object[5].second);
+	compare_type(JSON_ARRAY, j.value.object["a"]);
+	compare_array_size(3, j.value.object["a"]);
 	for (size_t k = 0; k < 3; k++) {
-		json e = j.value.object[5].second.value.array[k];
+		json e = j.value.object["a"].value.array[k];
 		compare_type(JSON_NUMBER, e);
 		compare_number(k+1, e);
 	}
 	compare_key("o", j, 6);
-	compare_type(JSON_OBJECT, j.value.object[6].second);
-	json e = j.value.object[6].second;
+	compare_type(JSON_OBJECT, j.value.object["o"]);
+	json e = j.value.object["o"];
 	compare_object_size(3, e);
 	for (size_t k = 0; k < 3; k++) {
 		string t;
 		t.push_back(char('1' + k));
 		compare_key(t, e, k);
-		compare_number(k+1, e.value.object[k].second);
+		compare_number(k+1, e.value.object[t]);
 	}
 
 	json_free(j);

@@ -5,11 +5,11 @@ void swap(json & left, json & right) {
 	swap(left.value, right.value);
 }
 
-bool operator!=(const json& left, const json& right) {
+bool operator!=(json& left, json& right) {
 	return !(left == right);
 }
 
-bool operator==(const json& left, const json& right) {
+bool operator==(json& left, json& right) {
 	if (left.type != right.type) return false;
 	switch (left.type)
 	{
@@ -18,13 +18,15 @@ bool operator==(const json& left, const json& right) {
 	case JSON_NUMBER: return left.value.number == right.value.number;
 	case JSON_STRING: return left.value.str == right.value.str;
 	case JSON_ARRAY: 
+		if (left.value.array.size() != right.value.array.size()) return false;
 		for (size_t i = 0; i < left.value.array.size(); i++) {
 			if (left.value.array[i] != right.value.array[i]) return false;
 		}
 		return true;
 	case JSON_OBJECT:
-		for (size_t i = 0; i < left.value.object.size(); i++) {
-			if ((left.value.object[i].first != right.value.object[i].first)|| (left.value.object[i].second != right.value.object[i].second)) return false;
+		if (left.value.object.size() != right.value.object.size()) return false;
+		for (auto& c : left.value.object) {
+			if (right.value.object[c.first] != c.second) return false;
 		}
 		return true;
 	default:
@@ -48,9 +50,9 @@ ostream& operator<<(ostream& out, const json& j) {
 		break;
 	case JSON_OBJECT:
 		out << "{";
-		for (size_t i = 0; i < j.value.object.size(); i++) {
-			out << "\"" << j.value.object[i].first << "\"" << " : " << j.value.object[i].second;
-			if (i != j.value.array.size() - 1) out << ", ";
+		for (auto i = j.value.object.begin(); i != j.value.object.end(); i++) {
+			out << "\"" << i->first << "\"" << " : " << i->second;
+			if (next(i) != j.value.object.end()) out << ", ";
 		}
 		out << "}";
 		break;
@@ -275,7 +277,7 @@ parse_state object_parse(parse_text& p, json& result) {
 			jump_space(p);
 			t = value_parse(p, j);
 			if (t != PARSE_COMPLETE) return t;
-			result.value.object.push_back({ str,j });
+			result.value.object.insert({ str,j });
 			jump_space(p);
 			if (p.s[p.i] == '}') break;
 			if (p.s[p.i] == ',') p.i++;
