@@ -1,21 +1,21 @@
 # cpp_json
 
-±¾ÏîÄ¿ÊÇ»ùÓÚ [json-tutorial](https://github.com/miloyip/json-tutorial) ½Ì³Ì ¸öÈËÑ§Ï°ºó¿ª·¢µÄc++°æ±¾ 
+æœ¬é¡¹ç›®æ˜¯åŸºäºŽ [json-tutorial](https://github.com/miloyip/json-tutorial) æ•™ç¨‹ ä¸ªäººå­¦ä¹ åŽå¼€å‘çš„c++ç‰ˆæœ¬ 
 
-Í¨¹ýcmake¹¹½¨¿çÆ½Ì¨Ê¹ÓÃµÄ´úÂë
+é€šè¿‡cmakeæž„å»ºè·¨å¹³å°ä½¿ç”¨çš„ä»£ç 
 
-Ïà½ÏÓÚÔ­½Ì³ÌÊ¹ÓÃÖ¸Õë¹ÜÀíÄÚ´æµÄ·½·¨  ±¾ÏîÄ¿Ê¹ÓÃC++µÄÈÝÆ÷À´¹ÜÀí¶¯Ì¬ÄÚ´æ  ÔÚ¿É¶ÁÐÔºÍ°²È«ÐÔÉÏ¶¼¸ü¸ß  µ«ÊÇÎþÉüÁËÒ»¶¨µÄÐÔÄÜ
+ç›¸è¾ƒäºŽåŽŸæ•™ç¨‹ä½¿ç”¨æŒ‡é’ˆç®¡ç†å†…å­˜çš„æ–¹æ³•  æœ¬é¡¹ç›®ä½¿ç”¨C++çš„å®¹å™¨æ¥ç®¡ç†åŠ¨æ€å†…å­˜  åœ¨å¯è¯»æ€§å’Œå®‰å…¨æ€§ä¸Šéƒ½æ›´é«˜ 
 
-±¾ÏîÄ¿Ïà½ÏÓÚÔ­ÏîÄ¿ÔÚÄ³Ð©´¦ÀíÉÏÓÐËù²»Í¬
+æœ¬é¡¹ç›®ç›¸è¾ƒäºŽåŽŸé¡¹ç›®åœ¨æŸäº›å¤„ç†ä¸Šæœ‰æ‰€ä¸åŒ
 
-ÔÚ×Ö·û´®´¦ÀíÉÏ ±¾ÏîÄ¿ÓÉÓÚÊ¹ÓÃÄÚÖÃµÄstring¶ø²»½âÎö\0×Ö·û  
+åœ¨å­—ç¬¦ä¸²å¤„ç†ä¸Š æœ¬é¡¹ç›®ç”±äºŽä½¿ç”¨å†…ç½®çš„stringè€Œä¸è§£æž\0å­—ç¬¦  
 
-ÔÚÊý×ÖÒç³ö·½Ãæ ±¾ÏîÄ¿²ÉÓÃÓëC++±¾ÉíÒ»ÖÂµÄ´¦Àí»úÖÆ ¶ÔÓÚÒç³öµÄÊý×Ö ÁîÆäÎª¶ÔÓ¦µÄ¼«ÏÞÖµ ²»½øÐÐ±¨´í
+åœ¨æ•°å­—æº¢å‡ºæ–¹é¢ æœ¬é¡¹ç›®é‡‡ç”¨ä¸ŽC++æœ¬èº«ä¸€è‡´çš„å¤„ç†æœºåˆ¶ å¯¹äºŽæº¢å‡ºçš„æ•°å­— ä»¤å…¶ä¸ºå¯¹åº”çš„æžé™å€¼ ä¸è¿›è¡ŒæŠ¥é”™
 
-±¾ÏîÄ¿Ê¹ÓÃ±ê×¼¿âµÄ map ÈÝÆ÷ÊµÏÖÁËJSON_OBJECT Òò´Ë¿ÉÒÔ·½±ãµÄÖ±½Óµ÷ÓÃmapµÄº¯Êý À´»ñÈ¡¼üÖµÇé¿ö ²éÕÒkeyµÈ
+æœ¬é¡¹ç›®ä½¿ç”¨æ ‡å‡†åº“çš„ map å®¹å™¨å®žçŽ°äº†JSON_OBJECT å› æ­¤å¯ä»¥æ–¹ä¾¿çš„ç›´æŽ¥è°ƒç”¨mapçš„å‡½æ•° æ¥èŽ·å–é”®å€¼æƒ…å†µ æŸ¥æ‰¾keyç­‰
 
-Ê¹ÓÃ vector ÈÝÆ÷ÊµÏÖÁËJSON_ARRAY ½øÐÐ¶¯Ì¬ÄÚ´æµÄ¹ÜÀí
+ä½¿ç”¨ vector å®¹å™¨å®žçŽ°äº†JSON_ARRAY è¿›è¡ŒåŠ¨æ€å†…å­˜çš„ç®¡ç†
 
-Í¬Ê± ±¾ÏîÄ¿»¹Í¨¹ýÖØÔØÔËËã·ûµÄ·½·¨ÊµÏÖÁË´íÎóÇé¿ö´òÓ¡, JSON¶ÔÏó´òÓ¡ÄÚÈÝ ºÍ JSON¶ÔÏó¿½±´¹¹Ôì£¬¿½±´¸³ÖµÔËËã·û£¬ÒÔ¼°Ö±½ÓÊ¹ÓÃÔËËã·û½øÐÐJSON¶ÔÏóµÄ±È½ÏÔËËã
+åŒæ—¶ æœ¬é¡¹ç›®è¿˜é€šè¿‡é‡è½½è¿ç®—ç¬¦çš„æ–¹æ³•å®žçŽ°äº†é”™è¯¯æƒ…å†µæ‰“å°, JSONå¯¹è±¡æ‰“å°å†…å®¹ å’Œ JSONå¯¹è±¡æ‹·è´æž„é€ ï¼Œæ‹·è´èµ‹å€¼è¿ç®—ç¬¦ï¼Œä»¥åŠç›´æŽ¥ä½¿ç”¨è¿ç®—ç¬¦è¿›è¡ŒJSONå¯¹è±¡çš„æ¯”è¾ƒè¿ç®—
 
-²¢ÇÒ¶¨ÒåÁËJSON¶ÔÏóµÄswap²Ù×÷
+å¹¶ä¸”å®šä¹‰äº†JSONå¯¹è±¡çš„swapæ“ä½œ
