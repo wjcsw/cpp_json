@@ -15,3 +15,7 @@
   - 定义了JSON对象的swap操作
 
 ## 项目结构
+- CMakeLists.txt：CMake配置文件  
+- cpp_json.cpp：测试文件，包含对于各项解析的单元测试  
+- cpp_json.h：头文件，对存储数据结构定义和解析函数定义  
+- parse.cpp：实现头文件中定义的解析函数  
